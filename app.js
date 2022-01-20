@@ -82,6 +82,15 @@ app.put('/todos/:id', (req, res) => {
     .then(() => res.redirect(`/todos/${id}`))
     .catch(error => console.log(error))
 })
+// 刪除
+app.delete('/todos/:id', (req, res) => {
+  const UserId = req.user.id
+  const id = req.params.id
+  
+  return Todo.destroy({ where: { id, UserId } })
+    .then(() => res.redirect('/'))
+    .catch(error => console.log(error))
+})
 //users
 app.get('/users/login', (req, res) => {
   res.render('login')
