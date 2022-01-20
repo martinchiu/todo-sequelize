@@ -26,12 +26,11 @@ usePassport(app)
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 app.use((req, res, next) => {
-  // 你可以在這裡 console.log(req.user) 等資訊來觀察
   res.locals.isAuthenticated = req.isAuthenticated()
   res.locals.user = req.user
   next()
 })
-
+// home
 app.get('/', authenticator, (req, res) => {
   return Todo.findAll({
     raw: true,
@@ -40,14 +39,25 @@ app.get('/', authenticator, (req, res) => {
     .then((todos) => { return res.render('index', { todos }) })
     .catch((error) => { return res.status(422).json(error) })
 })
+//todos
+app.get('/todos/new', authenticator,(req, res) => {
+  res.render('new')
+})
+app.post('/todos', authenticator,(req, res) => {
+  const UserId = req.user.id
+  const name = req.body.name // 從 req.body 拿出表單裡的 name 資料
 
+  return Todo.create({ name, UserId }) // 存入資料庫
+    .then(() => res.redirect('/')) // 新增完成後導回首頁
+    .catch(error => console.log(error))
+})
 app.get('/todos/:id', authenticator, (req, res) => {
   const id = req.params.id
   return Todo.findByPk(id)
     .then(todo => res.render('detail', { todo: todo.toJSON() }))
     .catch(error => console.log(error))
 })
-
+//users
 app.get('/users/login', (req, res) => {
   res.render('login')
 })
