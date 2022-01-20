@@ -31,13 +31,11 @@ module.exports = {
   putEdit: (req, res) => {
     const UserId = req.user.id
     const id = req.params.id
-    const { name, isDone } = req.body
-
+    const { name } = req.body
+    const isDone = req.body.isDone === 'on'
     return Todo.findOne({ where: { id, UserId } })
       .then(todo => {
-        todo.name = name
-        todo.isDone = isDone === 'on'
-        return todo.save()
+        todo.update({ isDone, name })
       })
       .then(() => res.redirect(`/todos/${id}`))
       .catch(error => console.log(error))
