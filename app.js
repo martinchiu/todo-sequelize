@@ -25,7 +25,12 @@ app.use(session({
 usePassport(app)
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
-
+app.use((req, res, next) => {
+  // 你可以在這裡 console.log(req.user) 等資訊來觀察
+  res.locals.isAuthenticated = req.isAuthenticated()
+  res.locals.user = req.user
+  next()
+})
 
 app.get('/', authenticator, (req, res) => {
   return Todo.findAll({
