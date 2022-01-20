@@ -1,17 +1,11 @@
 const express = require('express')
 const router = express.Router()
 
-const passport = require('passport')
-
+const authController = require('../../services/authController')
 // 向 Facebook 發出請求
-router.get('/facebook', passport.authenticate('facebook', {
-  scope: ['email', 'public_profile']
-}))
+router.get('/facebook', authController.facebook)
 
 // Facebook 把資料發回來
-router.get('/facebook/callback', passport.authenticate('facebook', {
-  successRedirect: '/',
-  failureRedirect: '/users/login'
-}))
+router.get('/facebook/callback', authController.facebookCallback)
 
 module.exports = router
