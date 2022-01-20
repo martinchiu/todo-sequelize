@@ -40,6 +40,7 @@ app.get('/', authenticator, (req, res) => {
     .catch((error) => { return res.status(422).json(error) })
 })
 //todos
+// 新增
 app.get('/todos/new', authenticator,(req, res) => {
   res.render('new')
 })
@@ -51,10 +52,34 @@ app.post('/todos', authenticator,(req, res) => {
     .then(() => res.redirect('/')) // 新增完成後導回首頁
     .catch(error => console.log(error))
 })
+// 瀏覽
 app.get('/todos/:id', authenticator, (req, res) => {
   const id = req.params.id
   return Todo.findByPk(id)
     .then(todo => res.render('detail', { todo: todo.toJSON() }))
+    .catch(error => console.log(error))
+})
+// 修改
+app.get('/todos/:id/edit', (req, res) => {
+  const UserId = req.user.id
+  const id = req.params.id
+
+  return Todo.findOne({ where: { id, UserId }})
+    .then(todo => res.render('edit', { todo: todo.toJSON() }))
+    .catch(error => console.log(error))
+})
+app.put('/todos/:id', (req, res) => {
+  const UserId = req.user.id
+  const id = req.params.id
+  const { name, isDone } = req.body
+
+  return Todo.findOne({ where: { id, UserId } })
+    .then(todo => {
+      todo.name = name
+      todo.isDone = isDone === 'on'
+      return todo.save()
+    })
+    .then(() => res.redirect(`/todos/${id}`))
     .catch(error => console.log(error))
 })
 //users
